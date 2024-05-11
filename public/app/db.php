@@ -1,7 +1,16 @@
 <?php
-include_once '../config/database.php';
 
+// Loading database credential file
+include_once '../../config/database.php';
+
+/**
+ * [Description DB]
+ */
 class DB {
+    /**
+     * $conn - Database connection object
+     * @var [type]
+     */
     public $conn;
 
     public function getConnection() {
