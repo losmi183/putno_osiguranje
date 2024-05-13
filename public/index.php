@@ -24,19 +24,19 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="ime_prezime">Nosilac osiguranja (Ime i Prezime)*</label>
-                                    <input type="text" class="form-control" id="ime_prezime" required>
+                                    <input type="text" class="form-control" id="ime_prezime">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="datum_rodjenja">Datum rođenja*</label>
-                                    <input type="date" class="form-control" id="datum_rodjenja" required>
+                                    <input type="date" class="form-control" id="datum_rodjenja">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="broj_pasosa">Broj pasoša*</label>
-                                    <input type="text" class="form-control" id="broj_pasosa" required>
+                                    <input type="text" class="form-control" id="broj_pasosa">
                                 </div>
                             </div>
                         </div>
@@ -50,27 +50,32 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="email">Email*</label>
-                                    <input type="email" class="form-control" id="email" required>
+                                    <input type="email" class="form-control" id="email">
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="datum_putovanja_od">Datum putovanja (OD)*</label>
-                                    <input type="date" class="form-control" id="datum_putovanja_od" required>
+                            <div class="col-md-4" >
+                                <div class="row" id="od-do-datum">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="datum_putovanja_od">Datum putovanja (OD)*</label>
+                                            <input type="date" class="form-control" id="datum_putovanja_od">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="datum_putovanja_do">Datum putovanja (DO)*</label>
+                                            <input type="date" class="form-control" id="datum_putovanja_do">
+                                        </div>
+                                    </div>
+                                    <div id="broj-dana" class="col-md-2 text-success"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="datum_putovanja_do">Datum putovanja (DO)*</label>
-                                    <input type="date" class="form-control" id="datum_putovanja_do" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
                                     <label for="vrsta_polise">Odabir vrste polise osiguranja*</label>
-                                    <select class="form-control" id="vrsta_polise" required>
+                                    <select class="form-control" id="vrsta_polise">
                                         <option value="">Odaberi...</option>
                                         <option value="individualno">Individualno</option>
                                         <option value="grupno">Grupno</option>
@@ -116,6 +121,11 @@
 
         var vrsta_polise = "";
         var brojDodatnihOsiguranika = 0;
+        var sviInputiValidni = true;
+        var greske = [];
+        // var obelezeniInputi = [];
+        // var validacionaPoruka = '';
+
 
         /**
          * dodajDodatnogOsigurnaika - Funkcija dinamički kreira inpute za dodatnog osiguranika
@@ -142,6 +152,41 @@
             $('#dodatni-osiguranici').append(noviOsiguranik);
         }
 
+        function validate(inputId) {
+            // Selektujemo input polje na osnovu ID-ja koji je prosleđen funkciji 
+            var value = $('#' + inputId).val();
+            // proveravamo da li je vrednost input polja prazan string
+            if (value == '' || value === null || value === undefined) {
+                sviInputiValidni = false;
+                // objekat sadrži koji je input i tekst poruke
+                var greska = {};
+                greska.input = inputId;
+                greska.poruka = 'Polje je obavezno. ';
+                // dodajemo u niz greške 
+                greske.push(greska);
+            }
+        }
+
+        /**
+         * Kada se promeni vrednost u polju "datum_putovanja_do"
+         * Proverava da li je datum_putovanja_do jednak ili posle datum_putovanja_od
+         * Ispisuje koliko je dana razlika
+         */
+        $('#datum_putovanja_do').change(function() {
+            var datumOd = new Date($('#datum_putovanja_od').val());
+            var datumDo = new Date($(this).val());
+
+            // Provera da li je datum putovanja DO nakon datuma putovanja OD
+            if (datumDo < datumOd) {
+                alert('Datum povratka sa putovanja ne može biti pre datuma polaska na putovanje!');
+                $(this).val(''); // Resetujemo vrednost na prazno polje
+            } else {
+                // Izračunavanje razlike u danima i prikazivanje u #broj-dana
+                var razlikaUDanima = Math.ceil((datumDo - datumOd) / (1000 * 60 * 60 * 24));
+                $('#broj-dana').text(razlikaUDanima + ' dan(a)');
+            }
+        });
+
         // Na osnovu vrednosti select-a prikazujemo/sakrivamo dugme za dodavanje dodatnog osiguranika
         $('#vrsta_polise').change(function(){
             vrsta_polise = $(this).val();
@@ -161,8 +206,9 @@
 
         /**
          * Klik na Potvrdi
-         * 1. Validacija svih inputa
-         * 2. Pakovanje u niz
+         * 1. uklanjanje starih validacionih poruka
+         * 2. Pakovanje u niz i Validacija svih inputa
+         * 3. obeležavanje inputa koji nisu validni i prikaz greške
          * 3. Slanje Ajax-om u backend
          * 4. Prikazujemo poruku sa backenda / praznimo sve inpute ukoliko je uspešno dodavanje 
          */
@@ -172,29 +218,62 @@
             // Definišemo prazan objekat koji ćemo puniti podacima iz inputa
             var data = {};
             
-            // Podaci glavnog osiguranika
-            data.ime_prezime = $('#ime_prezime').val();
-            data.datum_rodjenja = $('#datum_rodjenja').val();
-            data.broj_pasosa = $('#broj_pasosa').val();
-            data.telefon = $('#telefon').val();
-            data.email = $('#email').val();
-            data.datum_putovanja_od = $('#datum_putovanja_od').val();
-            data.datum_putovanja_do = $('#datum_putovanja_do').val();
-            data.vrsta_polise = $('#vrsta_polise').val();            
+            // Svi inputi glavnog osiguranika - poklapaju se imena promenjivih sa css selektorima radi jednostavnosti
+            const fields = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'telefon', 'email', 'datum_putovanja_od', 'datum_putovanja_do', 'vrsta_polise'];
+            // Inputi dodatnog osiguranika 
+            const fields2 = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa'];
+            // Obavezni inputi
+            const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
+            // const required = ['ime_prezime', 'datum_rodjenja'];
 
-            // Ako je grupno osiguranje i imamo dodatne osiguranike, dodajemo kao niz dodatnih osiguranika
+
+            // 1. Uklanjanje klasa 'border' i 'border-danger' sa svih input elemenata
+            $('input').removeClass('border border-danger');
+            // Uklanjanje svih after elemenata
+            $('input').next('.error-message').remove();
+
+            // 2.1 Iteriramo kroz niz polja i prikupljamo vrednosti iz inputa u data objekat
+            fields.forEach(item => { 
+                data[item] = $('#' + item).val();
+                // Validacija inputa - samo ako je obavezno polje 
+                if (required.includes(item)) {
+                    validate(item);
+                }
+            });      
+
+            // 2.2 Ako je grupno osiguranje i imamo dodatne osiguranike, dodajemo kao niz dodatnih osiguranika
             if(data.vrsta_polise === 'grupno' && brojDodatnihOsiguranika > 0) {
                 data.dodatniOsiguranici = [];
                 for(var i=1; i<=brojDodatnihOsiguranika; i++) {
                     var dodatniOsiguranik = {};
-                    dodatniOsiguranik.ime_prezime = $('#ime_prezime-' + i).val();
-                    dodatniOsiguranik.datum_rodjenja = $('#datum_rodjenja-' + i).val();
-                    dodatniOsiguranik.broj_pasosa = $('#broj_pasosa-' + i).val();
+                    fields2.forEach(item => { // Iteriramo kroz niz polja
+                        var id = item + '-' + i; // Dinamički formiramo ključeve
+                        dodatniOsiguranik[item] = $('#' + id).val(); 
+                        // Validacija inputa
+                        if (required.includes(item)) {
+                            validate(id);
+                        }
+                    });
                     data.dodatniOsiguranici.push(dodatniOsiguranik);
                 }
             }
 
+            // 3. Ako samo jedno obavezno polje nije popunjeno ovde se prekida izvršenje i šalje poruka
+            if(!sviInputiValidni) {
+                sviInputiValidni = true;
+                // Postavljanje crvene ivice oko nevalidnih input polja - niz greske
+                greske.forEach(item => {
+                    var $input = $('#' + item.input);
+                    $input.addClass('border border-danger');
+                    $input.after('<div class="error-message text-danger">' + item.poruka + '</div>');                
+                });
+                greske = [];
+                return false
+            }
+            
+            // 4. Ajax post
             console.log(data);
+
         });
 
     });
