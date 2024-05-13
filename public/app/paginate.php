@@ -5,7 +5,10 @@ include_once 'db.php';
 $db = new DB();
 $conn = $db->getConnection();
 $start = isset($_GET['start']) && is_numeric($_GET['start']) ? $_GET['start'] : 0; // Broj zapisa po stranici
-$length = isset($_GET['length']) && is_numeric($_GET['length']) ? $_GET['length'] : 3; // Broj zapisa po stranici
+$length = isset($_GET['length']) && is_numeric($_GET['length']) ? $_GET['length'] : 5; // Broj zapisa po stranici
+if($length == -1) {
+    $length = 10000;
+}
 
 
 // Ukupan broj filmova
