@@ -2,6 +2,7 @@
 
 include_once 'db.php';
 
+// Objekat konekcije i kreiranje konekcije ka bazi
 $db = new DB();
 $conn = $db->getConnection();
 $start = isset($_GET['start']) && is_numeric($_GET['start']) ? $_GET['start'] : 0; // Broj zapisa po stranici

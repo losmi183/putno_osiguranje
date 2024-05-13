@@ -161,10 +161,20 @@
                 // objekat sadrži koji je input i tekst poruke
                 var greska = {};
                 greska.input = inputId;
-                greska.poruka = 'Polje je obavezno. ';
+                greska.poruka = 'Polje ' + inputId + ' ne sme biti prazno. ';
                 // dodajemo u niz greške 
                 greske.push(greska);
             }
+        }
+
+        function prikaziGreske(greske) {
+            sviInputiValidni = true;
+                // Postavljanje crvene ivice oko nevalidnih input polja - niz greske
+                greske.forEach(item => {
+                    var $input = $('#' + item.input);
+                    $input.addClass('border border-danger');
+                    $input.after('<div class="error-message text-danger">' + item.poruka + '</div>');                
+                });
         }
 
         /**
@@ -223,9 +233,8 @@
             // Inputi dodatnog osiguranika 
             const fields2 = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa'];
             // Obavezni inputi
-            const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
-            // const required = ['ime_prezime', 'datum_rodjenja'];
-
+            // const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
+            const required = [];
 
             // 1. Uklanjanje klasa 'border' i 'border-danger' sa svih input elemenata
             $('input').removeClass('border border-danger');
@@ -259,20 +268,45 @@
             }
 
             // 3. Ako samo jedno obavezno polje nije popunjeno ovde se prekida izvršenje i šalje poruka
-            if(!sviInputiValidni) {
-                sviInputiValidni = true;
-                // Postavljanje crvene ivice oko nevalidnih input polja - niz greske
-                greske.forEach(item => {
-                    var $input = $('#' + item.input);
-                    $input.addClass('border border-danger');
-                    $input.after('<div class="error-message text-danger">' + item.poruka + '</div>');                
-                });
+            if(greske.length > 0) {
+                prikaziGreske(greske);
                 greske = [];
-                return false
+                return false;
             }
             
-            // 4. Ajax post
-            console.log(data);
+            // 4. Ajax post na PHP skriptu za upis u bazu
+            $.ajax({
+                url: '/app/store.php',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    // Provera da li je odgovor uspešan - nema validacionih grešaka
+                    debugger
+                    var decodedResponse = JSON.parse(response);
+                    if (decodedResponse.success === true) {
+                        // Obrada uspešnog odgovora
+                        alert(decodedResponse.message);
+                        // Praznimo data objekat sa prethodnim podacima
+                        data = [];
+                        // Sve inpute resetujemo
+                        $('input').val('');
+                    } else {
+                        // Dobijamo validacione greške sa backenda u istom formatu
+                        var decodedResponse = JSON.parse(response);
+                        var backendGreske = decodedResponse.errors;
+                        // Prikazujemo greške oko inputa
+                        console.log(backendGreske)
+                        if(backendGreske.length > 0 || backendGreske !== undefined) {
+                            prikaziGreske(decodedResponse.errors);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Obrada greške ako dođe do problema sa AJAX zahtevom
+                    console.error('Greška prilikom slanja na server:', error);
+                }
+            });
 
         });
 
