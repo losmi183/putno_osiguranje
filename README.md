@@ -4,7 +4,7 @@
     U config/apache.conf se nalazi primer podešavanja za virtual host
 
 - Baza podataka (Mysql ili MariaDB)
-    Dump baze podatka se nalazi u config/db.sql.
+    Dump baze podatka se nalazi u config/database.sql i sadrži test podatke koji se mogu odmah prikazati u tabeli
     U fajlu config/database.php se nalaze kredencijali za povezvanje sa bazom podataka, i moguće je promeniti ime baze, user ili password ukoliko je potrebno.
 
 - Testiranje validacije
