@@ -234,7 +234,11 @@
             const fields = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'telefon', 'email', 'datum_putovanja_od', 'datum_putovanja_do', 'vrsta_polise'];
             // Inputi dodatnog osiguranika 
             const fields2 = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa'];
-            // Obavezni inputi / validacija
+            /**
+             * validacija konfiguracioni niz - Obavezni inputi
+             * Mogla bi se uraditi kompleksnija varijanta, svako polje po veći broj validacija
+             * primer: ['ime_prezime': ['string', 'required'], email: ['email', 'required'] ... ]
+             */
             const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
             // const required = [];
 

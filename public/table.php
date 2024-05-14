@@ -153,7 +153,7 @@
                 data: null,
                 render: function(data, type, row) {
                     if (row.vrsta_polise === 'grupno') {
-                        var modalContent = '<div><p>Ime i prezime: ' + row.ime_prezime + '</p><p>Vrsta polise: ' + row.vrsta_polise + '</p>';
+                        var modalContent = '<div><p>Ime i prezime nosioca: ' + row.ime_prezime + '</p><p>Vrsta polise: ' + row.vrsta_polise + '</p>';
                         // Provera da li postoji polje dodatna_lica i dodavanje njegovog prikaza u modal
                         if (row.dodatna_lica && row.dodatna_lica.length > 0) {
                             modalContent += '<p>Dodatni osiguranici:</p><ul>';

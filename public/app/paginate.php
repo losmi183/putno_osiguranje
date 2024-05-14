@@ -33,7 +33,6 @@ $sql = "
     FROM nosioci_osiguranja AS n
     LEFT JOIN dodatna_lica AS d ON n.id = d.nosilac_osiguranja_id
     GROUP BY n.id
-    ORDER BY n.id 
     LIMIT $length 
     OFFSET $start
 ";
