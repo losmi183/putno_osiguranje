@@ -74,7 +74,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="vrsta_polise">Odabir vrste polise osiguranja*</label>
+                                    <label for="vrsta_polise">Odabir vrste polise osiguranja</label>
                                     <select class="form-control" id="vrsta_polise">
                                         <option value="">Odaberi...</option>
                                         <option value="individualno">Individualno</option>
