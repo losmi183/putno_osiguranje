@@ -1,13 +1,13 @@
-Basic CRUD app with PHP and Mysql
+- Instalacija
+    public folder treba da bude document root za web server (virtual host), ostali folderi ne treba da budu javno dostipni. PHP moze da pristupi config/database.php fajlu u kome se nalaze kredencijali za bazu podataka. 
+    Takođe bi fajl koji sadrži kredencijale ili druge poverljive informacije vezane za razvojno / produkciono okruženje, trebao da bude u .gitignore i da se ne nalazi na gitu, ali zbog jednostavnosti to sada nije urađeno.
+    U config/apache.conf se nalazi primer podešavanja za virtual host
 
-Public folder need to be document root for web server (virtual host). This way other folders not publicly accessible. Php can access config/database.php file with database credentials and make database connection, but web server can not
+- Baza podataka (Mysql ili MariaDB)
+    Dump baze podatka se nalazi u config/db.sql.
+    U fajlu config/database.php se nalaze kredencijali za povezvanje sa bazom podataka, i moguće je promeniti ime baze, user ili password ukoliko je potrebno.
 
-Create new Mysql (MariaDB) database with name 'paragraf' (user: root, no password)
-and create from file is in project root folder name: db.sql
-File config/database.php contain database credentials if need to be changed
-
-App content
--   Displaying all data in data table in server pagination mode, using ajax loading
--   Show single resource
--   Edit resource
--   Delete resource
+- Testiranje validacije
+    Kod upisa u bazu (index.php) implementirane su  validacija na frontendu, kao i backend validacija
+    Za testiranje backend validacije, može se isključiti frontend validacija tako što se zakomentariše konfiguracioni niz u public/index.php:238 red a otkomentariše public/index.php:239
+    

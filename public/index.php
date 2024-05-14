@@ -224,17 +224,19 @@
          */
         $('#potvrdi').click(function() {
 
+            /**
+             * Početna konfiguracija
+             */
             event.preventDefault(); 
             // Definišemo prazan objekat koji ćemo puniti podacima iz inputa
-            var data = {};
-            
+            var data = {};            
             // Svi inputi glavnog osiguranika - poklapaju se imena promenjivih sa css selektorima radi jednostavnosti
             const fields = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'telefon', 'email', 'datum_putovanja_od', 'datum_putovanja_do', 'vrsta_polise'];
             // Inputi dodatnog osiguranika 
             const fields2 = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa'];
-            // Obavezni inputi
-            // const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
-            const required = [];
+            // Obavezni inputi / validacija
+            const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
+            // const required = [];
 
             // 1. Uklanjanje klasa 'border' i 'border-danger' sa svih input elemenata
             $('input').removeClass('border border-danger');
@@ -282,7 +284,6 @@
                 data: JSON.stringify(data),
                 success: function(response) {
                     // Provera da li je odgovor uspešan - nema validacionih grešaka
-                    debugger
                     var decodedResponse = JSON.parse(response);
                     if (decodedResponse.success === true) {
                         // Obrada uspešnog odgovora
@@ -291,6 +292,7 @@
                         data = [];
                         // Sve inpute resetujemo
                         $('input').val('');
+                        $('#broj-dana').text('');
                     } else {
                         // Dobijamo validacione greške sa backenda u istom formatu
                         var decodedResponse = JSON.parse(response);
@@ -300,6 +302,10 @@
                         if(backendGreske.length > 0 || backendGreske !== undefined) {
                             prikaziGreske(decodedResponse.errors);
                         }
+                        // if(decodedResponse.errors !== undefined || decodedResponse.errors.length > 0) {
+                        //     var greske2 = JSON.stringify(decodedResponse.errors);
+                        //     alert(greske2);
+                        // }
                     }
                 },
                 error: function(xhr, status, error) {
