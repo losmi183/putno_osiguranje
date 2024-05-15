@@ -27,9 +27,19 @@ $totalData = $stmtTotal->fetch(PDO::FETCH_ASSOC)['total'];
  * Ovim je sve svedeno na 1 poziv ka bazi i izbegnut N+1 problem
  */
 $sql = "
-    SELECT 
-        n.*, 
-        GROUP_CONCAT(CONCAT('Ime i prezime: ', d.ime_prezime, ', datum rodjenja: ', d.datum_rodjenja, ', br pasosa: ', d.broj_pasosa) SEPARATOR '\n') AS dodatna_lica 
+    SELECT
+        DATE_FORMAT(n.datum_kreiranja, '%d-%m-%Y') AS datum_kreiranja,
+        n.ime_prezime, 
+        DATE_FORMAT(n.datum_rodjenja, '%d-%m-%Y') AS datum_rodjenja,
+        n.broj_pasosa,
+        n.telefon,
+        n.email,
+        DATE_FORMAT(n.datum_putovanja_od, '%d-%m-%Y') AS datum_putovanja_od,
+        DATE_FORMAT(n.datum_putovanja_do, '%d-%m-%Y') AS datum_putovanja_do,
+        DATEDIFF(n.datum_putovanja_do, n.datum_putovanja_od) AS broj_dana,
+        n.vrsta_polise,
+        GROUP_CONCAT(CONCAT(
+            'Ime i prezime: ', d.ime_prezime, ', datum rodjenja: ', DATE_FORMAT(d.datum_rodjenja, '%d-%m-%Y'), ', br pasosa: ', d.broj_pasosa) SEPARATOR '\n') AS dodatna_lica 
     FROM nosioci_osiguranja AS n
     LEFT JOIN dodatna_lica AS d ON n.id = d.nosilac_osiguranja_id
     GROUP BY n.id
@@ -43,7 +53,8 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Potrebno je da $row označimo kao referencu da bi mogli da menjamo vrednost
 foreach($data as &$row) {
     if($row['dodatna_lica'] && $row['dodatna_lica'] != '') {
-        $row['dodatna_lica'] = explode("\n", $row['dodatna_lica']);
+        $lice = explode("\n", $row['dodatna_lica']);
+        $row['dodatna_lica'] = $lice;
     }
 } 
 

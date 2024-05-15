@@ -63,11 +63,6 @@
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
 
 <script>
-    // Skripta učitava navbar iz fajla kako ne bi smo ponavljali kod
-    $(function(){
-        $("#navigation").load("/includes/navbar.php");
-    });
-
     // Funkcija za prikaz modala
     function showInfoModal(modalContent) {
         // Kreiranje modala sa Bootstrap modal komponentom
@@ -101,52 +96,15 @@
             },
         },
         columns: [
-            { 
-                data: 'datum_kreiranja',
-                render: function(data) {
-                    var dateParts = data.split(' ')[0].split('-');
-                    return dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0];
-                }
-            },  
-            { data: 'ime_prezime' }, // Ime i prezime osiguranika
-            // { data: 'datum_rodjenja' }, // Datum rođenja osiguranika
-            // Datum rodjenja - konverzija u čitljiviji datum
-            { 
-                data: 'datum_rodjenja',
-                render: function(data) {
-                    var dateParts = data.split('-');
-                    return dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0];
-                }
-            },
-            { data: 'broj_pasosa' }, // Broj pasoša osiguranika
-            { data: 'email' }, // Email osiguranika
-            { 
-            // Datum početka putovanja - konverzija u čitljiviji datum
-            data: 'datum_putovanja_od',
-                render: function(data) {
-                    var dateParts = data.split('-');
-                    return dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0];
-                }
-            },
-            // Datum završetka putovanja - konverzija u čitljiviji datum
-            { 
-                data: 'datum_putovanja_do',
-                render: function(data) {
-                    var dateParts = data.split('-');
-                    return dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0];
-                }
-            },
+            { data: 'datum_kreiranja' },  
+            { data: 'ime_prezime' },
+            { data: 'datum_rodjenja' },
+            { data: 'broj_pasosa' },
+            { data: 'email' },
+            { data: 'datum_putovanja_od' },
+            { data: 'datum_putovanja_do' },
             // Izračunavanje trajanja putovanja u danima
-            { 
-            data: null,
-                render: function(data, type, row) {
-                    // Računanje trajanja putovanja u danima
-                    var startDate = new Date(row.datum_putovanja_od);
-                    var endDate = new Date(row.datum_putovanja_do);
-                    var duration = (endDate - startDate) / (1000 * 60 * 60 * 24); // Pretvaranje razlike u dane
-                    return duration + ' dan(a)';
-                }
-            },
+            { data: 'broj_dana' },
             { data: 'vrsta_polise' }, // Vrsta polise
             // Akcije
             { 
