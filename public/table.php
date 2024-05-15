@@ -90,6 +90,28 @@
         modal.modal('show');
     }
 
+    function obrisi(id) {
+        // Prikaži dijalog za potvrdu
+        var confirmDelete = confirm("Da li ste sigurni da želite da obrišete osiguranika? Svi dodatna lica vezana za glavnog osiguranika biće obrisana! ");
+        if (confirmDelete) {
+            $.ajax({
+                url: '/app/delete.php',
+                type: 'POST',
+                data: JSON.stringify({ id: id }),
+                success: function(response) {
+                    // alert('Uspesno obrisan unos sa ID ' + id + '.');
+                    $('#report').DataTable().ajax.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Došlo je do greške prilikom brisanja unosa sa ID ' + id + ': ' + error);
+                    // Dodajte bilo kakve dodatne radnje koje želite izvršiti ako dođe do greške
+                }
+            });
+        } else {
+            // Ako korisnik odustane od brisanja, ne radimo ništa
+        }
+    }
+
     $('#report').DataTable({
         processing: true,
         serverSide: true, // Server side pagination mode on
@@ -131,6 +153,12 @@
                     } else {
                         return '';
                     }
+                }
+            },
+            { 
+                data: null,
+                render: function(data, type, row) {
+                    return '<button onclick="obrisi(' + row.id + ')">Obriši</button>';
                 }
             }
         ],

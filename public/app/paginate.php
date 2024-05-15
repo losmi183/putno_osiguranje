@@ -36,6 +36,7 @@ $totalData = $stmtTotal->fetch(PDO::FETCH_ASSOC)['total'];
  */
 $sql = "
     SELECT
+        n.id,
         DATE_FORMAT(n.datum_kreiranja, '$dateFormat') AS datum_kreiranja,
         n.ime_prezime, 
         DATE_FORMAT(n.datum_rodjenja, '$dateFormat') AS datum_rodjenja,
