@@ -2,6 +2,14 @@
 
 include_once 'db.php';
 
+/**
+ * Date format se kreira na nivou baze
+ * Potrebno je promeniti format samo na jednom mestu
+ */
+$dateFormat = '%d-%m-%Y';
+// $dateFormat = '%d. %m. %Y';
+
+
 // 1. Objekat konekcije i kreiranje konekcije ka bazi
 $db = new DB();
 $conn = $db->getConnection();
@@ -28,18 +36,18 @@ $totalData = $stmtTotal->fetch(PDO::FETCH_ASSOC)['total'];
  */
 $sql = "
     SELECT
-        DATE_FORMAT(n.datum_kreiranja, '%d-%m-%Y') AS datum_kreiranja,
+        DATE_FORMAT(n.datum_kreiranja, '$dateFormat') AS datum_kreiranja,
         n.ime_prezime, 
-        DATE_FORMAT(n.datum_rodjenja, '%d-%m-%Y') AS datum_rodjenja,
+        DATE_FORMAT(n.datum_rodjenja, '$dateFormat') AS datum_rodjenja,
         n.broj_pasosa,
         n.telefon,
         n.email,
-        DATE_FORMAT(n.datum_putovanja_od, '%d-%m-%Y') AS datum_putovanja_od,
-        DATE_FORMAT(n.datum_putovanja_do, '%d-%m-%Y') AS datum_putovanja_do,
+        DATE_FORMAT(n.datum_putovanja_od, '$dateFormat') AS datum_putovanja_od,
+        DATE_FORMAT(n.datum_putovanja_do, '$dateFormat') AS datum_putovanja_do,
         DATEDIFF(n.datum_putovanja_do, n.datum_putovanja_od) AS broj_dana,
         n.vrsta_polise,
         GROUP_CONCAT(CONCAT(
-            'Ime i prezime: ', d.ime_prezime, ', datum rodjenja: ', DATE_FORMAT(d.datum_rodjenja, '%d-%m-%Y'), ', br pasosa: ', d.broj_pasosa) SEPARATOR '\n') AS dodatna_lica 
+            'Ime i prezime: ', d.ime_prezime, ', datum rodjenja: ', DATE_FORMAT(d.datum_rodjenja, '$dateFormat'), ', br pasosa: ', d.broj_pasosa) SEPARATOR '\n') AS dodatna_lica 
     FROM nosioci_osiguranja AS n
     LEFT JOIN dodatna_lica AS d ON n.id = d.nosilac_osiguranja_id
     GROUP BY n.id
