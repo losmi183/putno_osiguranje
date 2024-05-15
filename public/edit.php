@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Početna / Unos novog osiguranja</title>
+    <title>Izmena osiguranja</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -13,7 +13,7 @@
         
         <div id="navigation"></div>
 
-        <h1>Početna / Unos novog osiguranja</h1>
+        <h1>Izmena osiguranja</h1>
 
         <div class="container-fluid">
             <div class="row p-3">
@@ -119,6 +119,39 @@
         // Skripta učitava navbar iz fajla kako bi kod bio reusable
         $("#navigation").load("/includes/navbar.php");
 
+        // Pomoću PHP dobijamo id iz query stringa 
+        var id = <?php echo json_encode($_GET['id'] ?? ''); ?>;
+
+        // AJAX GET zahtev ka /app/edit.php sa dodatim ID-om kao query string
+        $.ajax({
+            url: '/app/edit.php?id=' + id,
+            type: 'GET',
+            success: function(response) {
+
+                var decodedResponse = JSON.parse(response);
+                var nosilac_osiguranja = decodedResponse.nosilac_osiguranja;
+            
+                // Postavljanje vrednosti polja input elemenata na osnovu podataka iz JSON odgovora
+                $('#ime_prezime').val(nosilac_osiguranja.ime_prezime);
+                $('#datum_rodjenja').val(nosilac_osiguranja.datum_rodjenja);
+                $('#broj_pasosa').val(nosilac_osiguranja.broj_pasosa);
+                $('#telefon').val(nosilac_osiguranja.telefon);
+                $('#email').val(nosilac_osiguranja.email);
+                $('#datum_putovanja_od').val(nosilac_osiguranja.datum_putovanja_od);
+                $('#datum_putovanja_do').val(nosilac_osiguranja.datum_putovanja_do);
+                $('#vrsta_polise').val(nosilac_osiguranja.vrsta_polise);
+                
+                // Iteriranje kroz dodatna lica i kreiranje seta inputa sa vrednostima koje su u JSON-u
+                nosilac_osiguranja.dodatna_lica.forEach(function(osiguranik, index) {
+                    dodajDodatnogOsigurnaikaIPopuni(index+1, osiguranik);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Došlo je do greške prilikom izvršavanja GET zahteva ka /app/edit.php:', error);
+            }
+        });
+
+
         var vrsta_polise = "";
         var brojDodatnihOsiguranika = 0;
 
@@ -133,6 +166,34 @@
         // var obelezeniInputi = [];
         // var validacionaPoruka = '';
 
+        /**
+         * dodajDodatnogOsigurnaika - Funkcija dinamički kreira inpute za dodatnog osiguranika
+         * Dodatno popunjava i value za input 
+         */ 
+        function dodajDodatnogOsigurnaikaIPopuni (index, osiguranik) {
+            var noviOsiguranik = '<div id="dodatniOsiguranik-' + index + '" class="row border my-2 p-3">';
+            noviOsiguranik += '<div class="col-md-4">';
+            noviOsiguranik += `<h3>Dodatni osiguranik ${index}</h3>`;
+            noviOsiguranik += '<div class="form-group">';
+            noviOsiguranik += '<label for="ime_prezime">Nosilac osiguranja (Ime i Prezime)*</label>';
+            noviOsiguranik += '<input value="' + osiguranik.ime_prezime + '" id="ime_prezime-' + index + '" type="text" class="form-control" name="ime_prezime[]" required>';
+            noviOsiguranik += '</div></div>';
+            noviOsiguranik += '<div class="col-md-3">';
+            noviOsiguranik += '<div class="form-group">';
+            noviOsiguranik += '<label for="datum_rodjenja">Datum rođenja*</label>';
+            noviOsiguranik += '<input value="' + osiguranik.datum_rodjenja + '" id="datum_rodjenja-' + index + '" type="date" class="form-control" required>';
+            noviOsiguranik += '</div></div>';
+            noviOsiguranik += '<div class="col-md-4">';
+            noviOsiguranik += '<div class="form-group">';
+            noviOsiguranik += '<label for="broj_pasosa">Broj pasoša*</label>';
+            noviOsiguranik += '<input value="' + osiguranik.broj_pasosa + '" id="broj_pasosa-' + index + '" type="text" class="form-control" required>';
+            noviOsiguranik += '</div></div>';            
+            noviOsiguranik += '<div class="col-md-1">';
+            noviOsiguranik += `<button class="btn btn-danger" data-index="${index}">Izbaci</button>`;
+            noviOsiguranik += '</div></div></div>';            
+            $('#dodatni-osiguranici').append(noviOsiguranik);
+            console.log(nizDodatnihOsiguranika)
+        }
 
         /**
          * dodajDodatnogOsigurnaika - Funkcija dinamički kreira inpute za dodatnog osiguranika

@@ -149,7 +149,7 @@
                             modalContent += '</ul>';
                         }
                         modalContent += '</div>';
-                        return '<button onclick="showInfoModal(\'' + modalContent + '\')">Prikaži grupno osiguranje</button>';
+                        return '<button class="btn btn-success" onclick="showInfoModal(\'' + modalContent + '\')">Prikaži grupno osiguranje</button>';
                     } else {
                         return '';
                     }
@@ -158,9 +158,15 @@
             { 
                 data: null,
                 render: function(data, type, row) {
-                    return '<button onclick="obrisi(' + row.id + ')">Obriši</button>';
+                    return '<a class="btn btn-warning" href="/edit.php?id=' + row.id + '">Izmeni</a>';
                 }
-            }
+            },
+            { 
+                data: null,
+                render: function(data, type, row) {
+                    return '<button class="btn btn-danger" onclick="obrisi(' + row.id + ')">Obriši</button>';
+                }
+            },
         ],
         // Filters
         // revisionSubject: revisionSubject,
