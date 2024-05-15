@@ -21,6 +21,8 @@
                     <h2>Forma za unos novog osiguranja</h2>
                     <form id="form-data">
                         <div class="row">
+                            <input type="text" class="form-control" id="id">
+
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="ime_prezime">Nosilac osiguranja (Ime i Prezime)*</label>
@@ -132,6 +134,7 @@
                 var nosilac_osiguranja = decodedResponse.nosilac_osiguranja;
             
                 // Postavljanje vrednosti polja input elemenata na osnovu podataka iz JSON odgovora
+                $('#id').val(nosilac_osiguranja.id);
                 $('#ime_prezime').val(nosilac_osiguranja.ime_prezime);
                 $('#datum_rodjenja').val(nosilac_osiguranja.datum_rodjenja);
                 $('#broj_pasosa').val(nosilac_osiguranja.broj_pasosa);
@@ -140,6 +143,11 @@
                 $('#datum_putovanja_od').val(nosilac_osiguranja.datum_putovanja_od);
                 $('#datum_putovanja_do').val(nosilac_osiguranja.datum_putovanja_do);
                 $('#vrsta_polise').val(nosilac_osiguranja.vrsta_polise);
+
+                // DA prikaže u startu dugme za dodavanje
+                if(nosilac_osiguranja.vrsta_polise == 'grupno') {
+                    $('#dodatni-osiguranik').show();
+                }
                 
                 // Iteriranje kroz dodatna lica i kreiranje seta inputa sa vrednostima koje su u JSON-u
                 nosilac_osiguranja.dodatna_lica.forEach(function(osiguranik, index) {
@@ -330,7 +338,7 @@
             // Definišemo prazan objekat koji ćemo puniti podacima iz inputa
             var data = {};            
             // Svi inputi glavnog osiguranika - poklapaju se imena promenjivih sa css selektorima radi jednostavnosti
-            const fields = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'telefon', 'email', 'datum_putovanja_od', 'datum_putovanja_do', 'vrsta_polise'];
+            const fields = ['id', 'ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'telefon', 'email', 'datum_putovanja_od', 'datum_putovanja_do', 'vrsta_polise'];
             // Inputi dodatnog osiguranika 
             const fields2 = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa'];
             /**
@@ -385,7 +393,7 @@
             
             // 4. Ajax post na PHP skriptu za upis u bazu
             $.ajax({
-                url: '/app/store.php',
+                url: '/app/update.php',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
