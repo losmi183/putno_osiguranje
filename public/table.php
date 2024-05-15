@@ -63,6 +63,12 @@
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
 
 <script>
+
+    // Skripta učitava navbar iz fajla kako ne bi smo ponavljali kod
+    $(function(){
+        $("#navigation").load("/includes/navbar.php");
+    }); 
+
     // Funkcija za prikaz modala
     function showInfoModal(modalContent) {
         // Kreiranje modala sa Bootstrap modal komponentom

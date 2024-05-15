@@ -121,6 +121,13 @@
 
         var vrsta_polise = "";
         var brojDodatnihOsiguranika = 0;
+
+        /**
+         *  Evidentiramo id miniforme svaki put kada se klikne na Dodatni osiguranik
+         *  Takođe izbacujemo iz niza kada se klikne na obriši za tog osiguranika
+         */
+        var nizDodatnihOsiguranika = [];
+
         var sviInputiValidni = true;
         var greske = [];
         // var obelezeniInputi = [];
@@ -139,7 +146,7 @@
             noviOsiguranik += '<label for="ime_prezime">Nosilac osiguranja (Ime i Prezime)*</label>';
             noviOsiguranik += '<input id="ime_prezime-' + index + '" type="text" class="form-control" name="ime_prezime[]" required>';
             noviOsiguranik += '</div></div>';
-            noviOsiguranik += '<div class="col-md-4">';
+            noviOsiguranik += '<div class="col-md-3">';
             noviOsiguranik += '<div class="form-group">';
             noviOsiguranik += '<label for="datum_rodjenja">Datum rođenja*</label>';
             noviOsiguranik += '<input id="datum_rodjenja-' + index + '" type="date" class="form-control" required>';
@@ -148,9 +155,25 @@
             noviOsiguranik += '<div class="form-group">';
             noviOsiguranik += '<label for="broj_pasosa">Broj pasoša*</label>';
             noviOsiguranik += '<input id="broj_pasosa-' + index + '" type="text" class="form-control" required>';
+            noviOsiguranik += '</div></div>';            
+            noviOsiguranik += '<div class="col-md-1">';
+            noviOsiguranik += `<button class="btn btn-danger" data-index="${index}">Izbaci</button>`;
             noviOsiguranik += '</div></div></div>';            
             $('#dodatni-osiguranici').append(noviOsiguranik);
+            console.log(nizDodatnihOsiguranika)
         }
+
+        // on - hvata dogadjaj na dinamicki kreiranim elementima, data-index sadrzi index od kliknutog elementa
+        $(document).on('click', '.btn-danger', function() {
+            var index = $(this).data('index');
+            // Uklanja kliknuti element na osnovu id diva koji je vraper 
+            $('#dodatniOsiguranik-' + index).remove();
+            var indexToRemove = nizDodatnihOsiguranika.indexOf(index);
+            if (indexToRemove !== -1) {
+                nizDodatnihOsiguranika.splice(indexToRemove, 1);
+            }
+            console.log(nizDodatnihOsiguranika)
+        });
 
         function validate(inputId) {
             // Selektujemo input polje na osnovu ID-ja koji je prosleđen funkciji 
@@ -208,10 +231,25 @@
         });
 
         // Uhvati klik događaj na dugmetu "Dodatni osiguranik"
-        $('#dodatni-osiguranik').click(function(){
+        $('#dodatni-osiguranik').click(function() {
             brojDodatnihOsiguranika++;
-            // Dodaje inpute za novog osiguranika
-            dodajDodatnogOsigurnaika(brojDodatnihOsiguranika);
+
+            let rbr;
+            // Ova logika dodaje naredni inkrement u nizDodatnihOsiguranika
+            if (nizDodatnihOsiguranika.length === 0) {
+                rbr = 1;
+                nizDodatnihOsiguranika.push(rbr);
+            } else {
+                let najveci = Math.max(...nizDodatnihOsiguranika);
+                rbr = najveci + 1
+                nizDodatnihOsiguranika.push(rbr);
+            }
+
+            /**
+             * Potom poyivamo funkciju dodajDodatnogOsigurnaika(rbr) koja kreira set inputa
+             * Svaki id počinje sa rbr. Ovim smo ostvarili da imamo evidenciju svih setova inputa u nizu
+             */
+            dodajDodatnogOsigurnaika(rbr);
         });
 
         /**
@@ -259,10 +297,12 @@
             // 2.2 Ako je grupno osiguranje i imamo dodatne osiguranike, dodajemo kao niz dodatnih osiguranika
             if(data.vrsta_polise === 'grupno' && brojDodatnihOsiguranika > 0) {
                 data.dodatniOsiguranici = [];
-                for(var i=1; i<=brojDodatnihOsiguranika; i++) {
+
+                // Koristiom nizDodatnihOsiguranika koji sadrzi informaciju sa indexima #
+                nizDodatnihOsiguranika.forEach(index => {
                     var dodatniOsiguranik = {};
                     fields2.forEach(item => { // Iteriramo kroz niz polja
-                        var id = item + '-' + i; // Dinamički formiramo ključeve
+                        var id = item + '-' + index; // Dinamički formiramo ključeve
                         dodatniOsiguranik[item] = $('#' + id).val(); 
                         // Validacija inputa
                         if (required.includes(item)) {
@@ -270,13 +310,28 @@
                         }
                     });
                     data.dodatniOsiguranici.push(dodatniOsiguranik);
-                }
+                });
+
+                // for(var i=1; i<=brojDodatnihOsiguranika; i++) {
+                //     var dodatniOsiguranik = {};
+                //     fields2.forEach(item => { // Iteriramo kroz niz polja
+                //         var id = item + '-' + i; // Dinamički formiramo ključeve
+                //         dodatniOsiguranik[item] = $('#' + id).val(); 
+                //         // Validacija inputa
+                //         if (required.includes(item)) {
+                //             validate(id);
+                //         }
+                //     });
+                //     data.dodatniOsiguranici.push(dodatniOsiguranik);
+                // }
             }
 
             // 3. Ako samo jedno obavezno polje nije popunjeno ovde se prekida izvršenje i šalje poruka
             if(greske.length > 0) {
                 prikaziGreske(greske);
+                // Resetujemo greske a i data niz
                 greske = [];
+                data = [];
                 return false;
             }
             
