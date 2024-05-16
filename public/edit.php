@@ -303,9 +303,9 @@
             // 2.1 Iteriramo kroz niz polja i prikupljamo vrednosti iz inputa u data objekat
             fields.forEach(item => { 
                 data[item] = $('#' + item).val();
-                // Validacija inputa - samo ako je obavezno polje 
+                // Validacija inputa - samo ako je obavezno polje      
                 validate(item, validationErrors);
-            });      
+            });
 
             // 2.2 Ako je grupno osiguranje i imamo dodatne osiguranike, dodajemo kao niz dodatnih osiguranika
             if(data.vrsta_polise === 'grupno' && brojDodatnihOsiguranika > 0) {
@@ -318,7 +318,7 @@
                         var id = item + '-' + index; // Dinamički formiramo ključeve
                         dodatniOsiguranik[item] = $('#' + id).val(); 
                         // Validacija inputa
-                        validate(item, validationErrors);
+                        validate(id, validationErrors);
                     });
                     data.dodatniOsiguranici.push(dodatniOsiguranik);
                 });
