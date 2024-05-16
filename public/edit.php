@@ -130,11 +130,6 @@
          */
         var nizDodatnihOsiguranika = [];
 
-        /**
-         * validacija konfiguracioni niz - Obavezni inputi
-         * Mogla bi se uraditi kompleksnija varijanta, svako polje po veći broj validacija
-         * primer: ['ime_prezime': ['string', 'required'], email: ['email', 'required'] ... ]
-         */
         const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
         // const required = [];
         // U ovaj niz pakujemo greske
@@ -346,10 +341,6 @@
                         // Obrada uspešnog odgovora
                         alert(decodedResponse.message);
                         // Praznimo data objekat sa prethodnim podacima
-                        // data = [];
-                        // Sve inpute resetujemo
-                        // $('input').val('');
-                        // $('#broj-dana').text('');
                     } else {
                         // Dobijamo validacione greške sa backenda u istom formatu
                         var decodedResponse = JSON.parse(response);

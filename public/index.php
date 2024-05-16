@@ -315,9 +315,9 @@
                         var backendGreske = decodedResponse.errors;
                         // Prikazujemo greške oko inputa
                         console.log(backendGreske)
-                        // if(backendGreske.length > 0 || backendGreske !== undefined) {
-                        //     prikaziGreske(decodedResponse.errors);
-                        // }
+                        if(backendGreske.length > 0 || backendGreske !== undefined) {
+                            prikaziGreske(decodedResponse.errors);
+                        }
                     }
                 },
                 error: function(xhr, status, error) {

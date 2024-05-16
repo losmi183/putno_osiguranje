@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($required as $field) {
         // 2.1 Glavni korisnik - Provera da li polje postoji i da li je prazno 
         if (!isset($data[$field]) || empty($data[$field])) {
-            $greske[] = ['input' => $field, 'poruka' => 'Polje ' . $field . ' ne sme biti prazno.'];
+            $greske[] = ['inputId' => $field, 'message' => 'Polje ' . $field . ' ne sme biti prazno.'];
         }
     }
 

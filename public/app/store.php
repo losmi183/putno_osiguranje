@@ -20,12 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($required as $field) {
         // 2.1 Glavni korisnik - Provera da li polje postoji i da li je prazno 
         if (!isset($data[$field]) || empty($data[$field])) {
-            $greske[] = ['input' => $field, 'poruka' => 'Polje ' . $field . ' ne sme biti prazno.'];
+            $greske[] = ['inputId' => $field, 'message' => 'Polje ' . $field . ' ne sme biti prazno.'];
         }
     }
 
     // 2.2 Dodatni osiguranici - prikupljaju se greške u posebnu promenjivu kao string
-    // Potrebno je dovršiti slanje i prikaz na frontu za ove greške
+    // Format povratne poruke je drugačiji i moguće ga je prikazati u alertu
     if (isset($data['dodatniOsiguranici']) && is_array($data['dodatniOsiguranici']) && count($data['dodatniOsiguranici']) > 0) {
         $greske2 = '';
         foreach ($data['dodatniOsiguranici'] as $key => $osiguranik) {

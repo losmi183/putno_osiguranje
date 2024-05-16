@@ -55,10 +55,10 @@ function dodajDodatnogOsigurnaikaIPopuni (index, osiguranik) {
 }
 
 const validationRules = {
-    'ime_prezime': ['required', { 'max': 10 }],
+    'ime_prezime': ['required', { 'max': 255 }],
     'datum_rodjenja': ['required'],
-    'broj_pasosa': ['required'],
-    'email': ['required', 'email'],
+    'broj_pasosa': ['required', { 'max': 20 }],
+    'email': ['required', 'email', { 'max': 20 }],
     'datum_putovanja_od': ['required'],
     'datum_putovanja_do': ['required']
 };
