@@ -17,6 +17,6 @@
 
 - Na frontu, polja za dodatna lica se dinamički kreiraju, svaki novokreirani input dinamički dobija jedinstven id preko koga mu pristupamo. Struktura se čuva u nizu i moguće je dinamičko brisanje i dodavanje novih inputa po potrebi.
 
-Validacija je rešena dinamički, na osnovu konfiguracionog niza. Podržane su validacije: obavezno polje, minimalan i maksimalan broj karaktera i email, i svakom inputu se može dodeliti proizvoljan set validacija.
+- Validacija je rešena dinamički, na osnovu konfiguracionog niza. Podržane su validacije: obavezno polje, minimalan i maksimalan broj karaktera i email, i svakom inputu se može dodeliti proizvoljan set validacija.
 Validacione greške se prikazuju ispod inputa u kome je nastala greška. 
 Takođe su implementirane backend validacije pre krajnjeg upisa u bazu.
