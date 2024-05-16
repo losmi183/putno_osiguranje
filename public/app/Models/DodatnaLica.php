@@ -10,6 +10,15 @@ class DodatnaLica {
         $this->conn = $this->db->getConnection();
     }
 
+    public function get($id): array
+    {
+        $sql_dodatna_lica = "SELECT * FROM $this->table WHERE nosilac_osiguranja_id = :id";
+        $stmt_dodatna_lica = $this->conn->prepare($sql_dodatna_lica);
+        $stmt_dodatna_lica->bindParam(':id', $id);
+        $stmt_dodatna_lica->execute();
+        return $stmt_dodatna_lica->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /**
      * store - upisuje u dodatna_lica tabelu
      * @param array $data
@@ -39,7 +48,7 @@ class DodatnaLica {
     public function delete($id): bool
     {
         $stmt = $this->conn->prepare("DELETE FROM $this->table WHERE nosilac_osiguranja_id = :nosilac_osiguranja_id");
-        $stmt->bindParam(':nosilac_osiguranja_id', $data['id']);
+        $stmt->bindParam(':nosilac_osiguranja_id', $id);
         $stmt->execute();
         return true;
     }

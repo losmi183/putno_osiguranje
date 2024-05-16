@@ -14,6 +14,20 @@ class NosiociOsiguranja {
     }
 
     /**
+     * @param mixed $id
+     * 
+     * @return array
+     */
+    public function get($id): array
+    {
+        $sql_nosioc = "SELECT * FROM $this->table WHERE id = :id";
+        $stmt_nosioc = $this->conn->prepare($sql_nosioc);
+        $stmt_nosioc->bindParam(':id', $id);
+        $stmt_nosioc->execute();
+        return $stmt_nosioc->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * store -  
      * @param array $data
      * 
@@ -74,9 +88,14 @@ class NosiociOsiguranja {
      */
     public function delete($id): bool
     {
-        $sql = "DELETE FROM $this->table WHERE id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(1, $data['id'], PDO::PARAM_INT);
+        try {
+            $sql = "DELETE FROM $this->table WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(1, $id, PDO::PARAM_INT);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
         return true;
+
     }
 }

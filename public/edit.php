@@ -21,7 +21,7 @@
                     <h2>Forma za unos novog osiguranja</h2>
                     <form id="form-data">
                         <div class="row">
-                            <input type="text" class="form-control" id="id">
+                            <input type="hidden" class="form-control" id="id">
 
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -346,10 +346,10 @@
                         // Obrada uspešnog odgovora
                         alert(decodedResponse.message);
                         // Praznimo data objekat sa prethodnim podacima
-                        data = [];
+                        // data = [];
                         // Sve inpute resetujemo
-                        $('input').val('');
-                        $('#broj-dana').text('');
+                        // $('input').val('');
+                        // $('#broj-dana').text('');
                     } else {
                         // Dobijamo validacione greške sa backenda u istom formatu
                         var decodedResponse = JSON.parse(response);
