@@ -1,4 +1,29 @@
 /**
+ * Fajl sadrži funkcije koje se koriste više puta
+ */
+
+
+// Pomoćna funkcija proverava da li je datum validan
+function isValidDate(d) {
+    return d instanceof Date && !isNaN(d);
+}
+
+function brojDana(datumOd, datumDo) {
+    // Tek kada su oba datuma selektovana/validna računamo i prikazujemo
+    if (isValidDate(datumOd) && isValidDate(datumDo)) {
+        // Provera da li je datum putovanja DO nakon datuma putovanja OD
+        if (datumDo < datumOd) {
+            alert('Datum povratka sa putovanja ne može biti pre datuma polaska na putovanje!');
+            $(this).val(''); // Resetujemo vrednost na prazno polje
+        } else {
+            // Izračunavanje razlike u danima i prikazivanje u #broj-dana
+            var razlikaUDanima = Math.ceil((datumDo - datumOd) / (1000 * 60 * 60 * 24));
+            $('#broj-dana').text(razlikaUDanima + ' dan(a)');
+        }
+    }
+}
+
+/**
  * dodajDodatnogOsigurnaika - Funkcija dinamički kreira inpute za dodatnog osiguranika
  * 
  */ 

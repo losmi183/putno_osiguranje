@@ -173,6 +173,11 @@
                     brojDodatnihOsiguranika++;
                     nizDodatnihOsiguranika.push(index+1);
                 });
+
+                // Računanje broja dana pri učitavanju
+                var datumOd = new Date($('#datum_putovanja_od').val());
+                var datumDo = new Date($('#datum_putovanja_do').val());        
+                brojDana(datumOd, datumDo);
             },
             error: function(xhr, status, error) {
                 console.error('Došlo je do greške prilikom izvršavanja GET zahteva ka /app/edit.php:', error);
@@ -222,20 +227,12 @@
          * Proverava da li je datum_putovanja_do jednak ili posle datum_putovanja_od
          * Ispisuje koliko je dana razlika
          */
-        $('#datum_putovanja_do').change(function() {
+        $('#datum_putovanja_do,#datum_putovanja_od').change(function() {
             var datumOd = new Date($('#datum_putovanja_od').val());
-            var datumDo = new Date($(this).val());
-
-            // Provera da li je datum putovanja DO nakon datuma putovanja OD
-            if (datumDo < datumOd) {
-                alert('Datum povratka sa putovanja ne može biti pre datuma polaska na putovanje!');
-                $(this).val(''); // Resetujemo vrednost na prazno polje
-            } else {
-                // Izračunavanje razlike u danima i prikazivanje u #broj-dana
-                var razlikaUDanima = Math.ceil((datumDo - datumOd) / (1000 * 60 * 60 * 24));
-                $('#broj-dana').text(razlikaUDanima + ' dan(a)');
-            }
+            var datumDo = new Date($('#datum_putovanja_do').val());        
+            brojDana(datumOd, datumDo);
         });
+
 
         // Na osnovu vrednosti select-a prikazujemo/sakrivamo dugme za dodavanje dodatnog osiguranika
         $('#vrsta_polise').change(function(){
