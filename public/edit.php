@@ -130,6 +130,16 @@
          */
         var nizDodatnihOsiguranika = [];
 
+        /**
+         * validacija konfiguracioni niz - Obavezni inputi
+         * Mogla bi se uraditi kompleksnija varijanta, svako polje po veći broj validacija
+         * primer: ['ime_prezime': ['string', 'required'], email: ['email', 'required'] ... ]
+         */
+        const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
+        // const required = [];
+        // U ovaj niz pakujemo greske
+        var validationErrors = [];
+
         var sviInputiValidni = true;
         var greske = [];    
 
@@ -186,29 +196,30 @@
             console.log(nizDodatnihOsiguranika)
         });
 
-        function validate(inputId) {
-            // Selektujemo input polje na osnovu ID-ja koji je prosleđen funkciji 
-            var value = $('#' + inputId).val();
-            // proveravamo da li je vrednost input polja prazan string
-            if (value == '' || value === null || value === undefined) {
-                sviInputiValidni = false;
-                // objekat sadrži koji je input i tekst poruke
-                var greska = {};
-                greska.input = inputId;
-                greska.poruka = 'Polje ' + inputId + ' ne sme biti prazno. ';
-                // dodajemo u niz greške 
-                greske.push(greska);
-            }
-        }
+        // function validate(inputId) {
+        //     // Selektujemo input polje na osnovu ID-ja koji je prosleđen funkciji 
+        //     var value = $('#' + inputId).val();
+        //     // proveravamo da li je vrednost input polja prazan string
+        //     if (value == '' || value === null || value === undefined) {
+        //         sviInputiValidni = false;
+        //         // objekat sadrži koji je input i tekst poruke
+        //         var greska = {};
+        //         greska.input = inputId;
+        //         greska.poruka = 'Polje ' + inputId + ' ne sme biti prazno. ';
+        //         // dodajemo u niz greške 
+        //         greske.push(greska);
+        //     }
+        // }
 
-        function prikaziGreske(greske) {
-            sviInputiValidni = true;
-                // Postavljanje crvene ivice oko nevalidnih input polja - niz greske
-                greske.forEach(item => {
-                    var $input = $('#' + item.input);
-                    $input.addClass('border border-danger');
-                    $input.after('<div class="error-message text-danger">' + item.poruka + '</div>');                
-                });
+        function prikaziGreske(validationErrors) {
+        // sviInputiValidni = true;
+            // Postavljanje crvene ivice oko nevalidnih input polja - niz greske
+            validationErrors.forEach(item => {
+                var $input = $('#' + item.inputId);
+                $input.addClass('border border-danger');
+                $input.after('<div class="error-message text-danger">' + item.message + '</div>');                
+            });
+            console.log(validationErrors)
         }
 
         /**
@@ -283,26 +294,17 @@
             const fields = ['id', 'ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'telefon', 'email', 'datum_putovanja_od', 'datum_putovanja_do', 'vrsta_polise'];
             // Inputi dodatnog osiguranika 
             const fields2 = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa'];
-            /**
-             * validacija konfiguracioni niz - Obavezni inputi
-             * Mogla bi se uraditi kompleksnija varijanta, svako polje po veći broj validacija
-             * primer: ['ime_prezime': ['string', 'required'], email: ['email', 'required'] ... ]
-             */
-            const required = ['ime_prezime', 'datum_rodjenja', 'broj_pasosa', 'email', 'datum_putovanja_od', 'datum_putovanja_do'];
-            // const required = [];
 
             // 1. Uklanjanje klasa 'border' i 'border-danger' sa svih input elemenata
             $('input').removeClass('border border-danger');
             // Uklanjanje svih after elemenata
-            $('input').next('.error-message').remove();
+            $('input').nextAll('.error-message').remove();
 
             // 2.1 Iteriramo kroz niz polja i prikupljamo vrednosti iz inputa u data objekat
             fields.forEach(item => { 
                 data[item] = $('#' + item).val();
                 // Validacija inputa - samo ako je obavezno polje 
-                if (required.includes(item)) {
-                    validate(item);
-                }
+                validate(item, validationErrors);
             });      
 
             // 2.2 Ako je grupno osiguranje i imamo dodatne osiguranike, dodajemo kao niz dodatnih osiguranika
@@ -316,19 +318,17 @@
                         var id = item + '-' + index; // Dinamički formiramo ključeve
                         dodatniOsiguranik[item] = $('#' + id).val(); 
                         // Validacija inputa
-                        if (required.includes(item)) {
-                            validate(id);
-                        }
+                        validate(item, validationErrors);
                     });
                     data.dodatniOsiguranici.push(dodatniOsiguranik);
                 });
             }
 
             // 3. Ako samo jedno obavezno polje nije popunjeno ovde se prekida izvršenje i šalje poruka
-            if(greske.length > 0) {
-                prikaziGreske(greske);
+            if(validationErrors.length > 0) {
+                prikaziGreske(validationErrors);
                 // Resetujemo greske a i data niz
-                greske = [];
+                validationErrors = [];
                 data = [];
                 return false;
             }

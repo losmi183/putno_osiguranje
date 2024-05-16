@@ -53,3 +53,77 @@ function dodajDodatnogOsigurnaikaIPopuni (index, osiguranik) {
     noviOsiguranik += '</div></div></div>';            
     $('#dodatni-osiguranici').append(noviOsiguranik);
 }
+
+const validationRules = {
+    'ime_prezime': ['required', { 'max': 10 }],
+    'datum_rodjenja': ['required'],
+    'broj_pasosa': ['required'],
+    'email': ['required', 'email'],
+    'datum_putovanja_od': ['required'],
+    'datum_putovanja_do': ['required']
+};
+
+function validate(inputId, validationErrors) {
+    
+    // Selektujemo input polje na osnovu ID-ja koji je prosleđen funkciji 
+    var value = $('#' + inputId).val();
+    // Odvajamo samo tip inputa nezavisno od id (zbog dodatnik inputa)
+    var inputType;
+    if (inputId.indexOf('-') === -1) {
+        inputType = inputId;
+    } else {
+        inputType = inputId.substring(0, inputId.indexOf('-'));
+    }
+
+    // Ako input nije u validacionim pravilima preskacemo
+    if (!(inputType in validationRules)) {
+        return; // Izlazak iz funkcije
+    }
+
+    var rules = validationRules[inputType];
+    rules.forEach((rule) => {
+        
+        if (typeof rule === 'object') {
+
+            var ruleName = Object.keys(rule)[0];
+            var ruleValue = rule[ruleName];
+
+            if(ruleName == 'max') {
+                if(value.length > ruleValue) {
+                    validationErrors.push({
+                        inputId: inputId,
+                        message: 'Maksimalni broj karaktera je ' + ruleValue
+                    })
+                }
+            }
+            if(ruleName == 'min') {
+                if(value.length < ruleValue) {
+                    validationErrors.push({
+                        inputId: inputId,
+                        message: 'Minimalni broj karaktera je ' + ruleValue
+                    })
+                }
+            }
+        }
+        if(typeof rule === 'string') {
+            if(rule == 'required') {
+                if(value == '' || value === null || value === undefined) {
+                    validationErrors.push({
+                        inputId: inputId,
+                        message: 'Polje mora biti popunjeno'
+                    })
+                }
+            }
+        }
+        if (rule === 'email') {
+            // Provera da li je value validna email adresa
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                validationErrors.push({
+                    inputId: inputId,
+                    message: 'Polje mora biti validna email adresa'
+                })
+            }
+        }
+    });
+}
