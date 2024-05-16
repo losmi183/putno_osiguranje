@@ -115,11 +115,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+<script src="/js/app.js"></script>
 
 <script>
     $(function(){
         // Skripta učitava navbar iz fajla kako bi kod bio reusable
         $("#navigation").load("/includes/navbar.php");
+
+        var vrsta_polise = "";
+        var brojDodatnihOsiguranika = 0;
+        /**
+         *  Evidentiramo id miniforme svaki put kada se klikne na Dodatni osiguranik
+         *  Takođe izbacujemo iz niza kada se klikne na obriši za tog osiguranika
+         */
+        var nizDodatnihOsiguranika = [];
+
+        var sviInputiValidni = true;
+        var greske = [];    
 
         // Pomoću PHP dobijamo id iz query stringa 
         var id = <?php echo json_encode($_GET['id'] ?? ''); ?>;
@@ -143,6 +155,7 @@
                 $('#datum_putovanja_od').val(nosilac_osiguranja.datum_putovanja_od);
                 $('#datum_putovanja_do').val(nosilac_osiguranja.datum_putovanja_do);
                 $('#vrsta_polise').val(nosilac_osiguranja.vrsta_polise);
+                vrsta_polise  = nosilac_osiguranja.vrsta_polise;
 
                 // DA prikaže u startu dugme za dodavanje
                 if(nosilac_osiguranja.vrsta_polise == 'grupno') {
@@ -152,85 +165,14 @@
                 // Iteriranje kroz dodatna lica i kreiranje seta inputa sa vrednostima koje su u JSON-u
                 nosilac_osiguranja.dodatna_lica.forEach(function(osiguranik, index) {
                     dodajDodatnogOsigurnaikaIPopuni(index+1, osiguranik);
+                    brojDodatnihOsiguranika++;
+                    nizDodatnihOsiguranika.push(index+1);
                 });
             },
             error: function(xhr, status, error) {
                 console.error('Došlo je do greške prilikom izvršavanja GET zahteva ka /app/edit.php:', error);
             }
         });
-
-
-        var vrsta_polise = "";
-        var brojDodatnihOsiguranika = 0;
-
-        /**
-         *  Evidentiramo id miniforme svaki put kada se klikne na Dodatni osiguranik
-         *  Takođe izbacujemo iz niza kada se klikne na obriši za tog osiguranika
-         */
-        var nizDodatnihOsiguranika = [];
-
-        var sviInputiValidni = true;
-        var greske = [];
-        // var obelezeniInputi = [];
-        // var validacionaPoruka = '';
-
-        /**
-         * dodajDodatnogOsigurnaika - Funkcija dinamički kreira inpute za dodatnog osiguranika
-         * Dodatno popunjava i value za input 
-         */ 
-        function dodajDodatnogOsigurnaikaIPopuni (index, osiguranik) {
-            var noviOsiguranik = '<div id="dodatniOsiguranik-' + index + '" class="row border my-2 p-3">';
-            noviOsiguranik += '<div class="col-md-4">';
-            noviOsiguranik += `<h3>Dodatni osiguranik ${index}</h3>`;
-            noviOsiguranik += '<div class="form-group">';
-            noviOsiguranik += '<label for="ime_prezime">Nosilac osiguranja (Ime i Prezime)*</label>';
-            noviOsiguranik += '<input value="' + osiguranik.ime_prezime + '" id="ime_prezime-' + index + '" type="text" class="form-control" name="ime_prezime[]" required>';
-            noviOsiguranik += '</div></div>';
-            noviOsiguranik += '<div class="col-md-3">';
-            noviOsiguranik += '<div class="form-group">';
-            noviOsiguranik += '<label for="datum_rodjenja">Datum rođenja*</label>';
-            noviOsiguranik += '<input value="' + osiguranik.datum_rodjenja + '" id="datum_rodjenja-' + index + '" type="date" class="form-control" required>';
-            noviOsiguranik += '</div></div>';
-            noviOsiguranik += '<div class="col-md-4">';
-            noviOsiguranik += '<div class="form-group">';
-            noviOsiguranik += '<label for="broj_pasosa">Broj pasoša*</label>';
-            noviOsiguranik += '<input value="' + osiguranik.broj_pasosa + '" id="broj_pasosa-' + index + '" type="text" class="form-control" required>';
-            noviOsiguranik += '</div></div>';            
-            noviOsiguranik += '<div class="col-md-1">';
-            noviOsiguranik += `<button class="btn btn-danger" data-index="${index}">Izbaci</button>`;
-            noviOsiguranik += '</div></div></div>';            
-            $('#dodatni-osiguranici').append(noviOsiguranik);
-            console.log(nizDodatnihOsiguranika)
-        }
-
-        /**
-         * dodajDodatnogOsigurnaika - Funkcija dinamički kreira inpute za dodatnog osiguranika
-         * 
-         */ 
-        function dodajDodatnogOsigurnaika (index) {
-            var noviOsiguranik = '<div id="dodatniOsiguranik-' + index + '" class="row border my-2 p-3">';
-            noviOsiguranik += '<div class="col-md-4">';
-            noviOsiguranik += `<h3>Dodatni osiguranik ${index}</h3>`;
-            noviOsiguranik += '<div class="form-group">';
-            noviOsiguranik += '<label for="ime_prezime">Nosilac osiguranja (Ime i Prezime)*</label>';
-            noviOsiguranik += '<input id="ime_prezime-' + index + '" type="text" class="form-control" name="ime_prezime[]" required>';
-            noviOsiguranik += '</div></div>';
-            noviOsiguranik += '<div class="col-md-3">';
-            noviOsiguranik += '<div class="form-group">';
-            noviOsiguranik += '<label for="datum_rodjenja">Datum rođenja*</label>';
-            noviOsiguranik += '<input id="datum_rodjenja-' + index + '" type="date" class="form-control" required>';
-            noviOsiguranik += '</div></div>';
-            noviOsiguranik += '<div class="col-md-4">';
-            noviOsiguranik += '<div class="form-group">';
-            noviOsiguranik += '<label for="broj_pasosa">Broj pasoša*</label>';
-            noviOsiguranik += '<input id="broj_pasosa-' + index + '" type="text" class="form-control" required>';
-            noviOsiguranik += '</div></div>';            
-            noviOsiguranik += '<div class="col-md-1">';
-            noviOsiguranik += `<button class="btn btn-danger" data-index="${index}">Izbaci</button>`;
-            noviOsiguranik += '</div></div></div>';            
-            $('#dodatni-osiguranici').append(noviOsiguranik);
-            console.log(nizDodatnihOsiguranika)
-        }
 
         // on - hvata dogadjaj na dinamicki kreiranim elementima, data-index sadrzi index od kliknutog elementa
         $(document).on('click', '.btn-danger', function() {
