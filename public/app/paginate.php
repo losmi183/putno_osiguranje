@@ -2,6 +2,10 @@
 
 include_once 'db.php';
 
+// Pokupi json
+
+// uradi izmenu u bazi za id tabela nosioci_osiguranja
+
 /**
  * Date format se kreira na nivou baze
  * Potrebno je promeniti format samo na jednom mestu

@@ -1,6 +1,7 @@
 <?php
 
-include_once 'db.php';
+include_once 'Models/NosiociOsiguranja.php';
+include_once 'Models/DodatnaLica.php';
 
 // Provera da li je zahtev HTTP POST metodom
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -43,55 +44,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // 3 Objekat konekcije i kreiranje konekcije ka bazi 
-    $db = new DB();
-    $conn = $db->getConnection();
-
     try {
         /**
          * 3.1 Upis glavnog osiguranika u bazu
          */
-        $stmt = $conn->prepare("INSERT INTO nosioci_osiguranja (ime_prezime, datum_rodjenja, broj_pasosa, telefon, email, datum_putovanja_od, datum_putovanja_do, vrsta_polise) 
-                                VALUES (:ime_prezime, :datum_rodjenja, :broj_pasosa, :telefon, :email, :datum_putovanja_od, :datum_putovanja_do, :vrsta_polise)");
-
-        // Bindovanje vrednosti parametara sa odgovarajućim ključevima u nizu podataka
-        $stmt->bindParam(':ime_prezime', $data['ime_prezime']);
-        $stmt->bindParam(':datum_rodjenja', $data['datum_rodjenja']);
-        $stmt->bindParam(':broj_pasosa', $data['broj_pasosa']);
-        $stmt->bindParam(':telefon', $data['telefon']);
-        $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':datum_putovanja_od', $data['datum_putovanja_od']);
-        $stmt->bindParam(':datum_putovanja_do', $data['datum_putovanja_do']);
-        $stmt->bindParam(':vrsta_polise', $data['vrsta_polise']);
-
-        // Izvršavanje prepared statementa
-        $stmt->execute();
-
-        // Dobijanje ID poslednjeg dodatog reda
-        $lastInsertedId = $conn->lastInsertId();
+         // Kreiramo objekat / model NosiociOsiguranja
+        $nosiociOsiguranja = new NosiociOsiguranja;
+        try {
+            $lastInsertedId = $nosiociOsiguranja->store($data);  
+        } catch (PDOException $e) {
+            // Hvatanje grešaka koje se mogu pojaviti tokom upisa u bazu
+            $greske[] = 'Došlo je do greške prilikom upisa nosioca osiguranja: ';
+        }
+        
 
         /**
          * 3.2 Upis u bazu dodatnih osiguranika ako su poslati 
          */
         if (isset($data['dodatniOsiguranici']) && is_array($data['dodatniOsiguranici']) && count($data['dodatniOsiguranici']) > 0) {
+            // Kreiramo objekat / model DodatnaLica 
+            $dodatnaLica = new DodatnaLica();
             foreach ($data['dodatniOsiguranici'] as $osiguranik) {
                 try {
-                    // Priprema SQL upita sa PDO prepared statement
-                    $stmt = $conn->prepare("INSERT INTO dodatna_lica (nosilac_osiguranja_id, ime_prezime, datum_rodjenja, broj_pasosa) 
-                                            VALUES (:nosilac_osiguranja_id, :ime_prezime, :datum_rodjenja, :broj_pasosa)");
-
-                    // Bindovanje vrednosti parametara sa odgovarajućim ključevima u nizu podataka
-                    $stmt->bindParam(':nosilac_osiguranja_id', $lastInsertedId);
-                    $stmt->bindParam(':ime_prezime', $osiguranik['ime_prezime']);
-                    $stmt->bindParam(':datum_rodjenja', $osiguranik['datum_rodjenja']);
-                    $stmt->bindParam(':broj_pasosa', $osiguranik['broj_pasosa']);
-
-                    // Izvršavanje prepared statementa
-                    $stmt->execute();
-
+                    $dodatnaLica->store($data, $lastInsertedId);   
                 } catch (PDOException $e) {
                     // Hvatanje grešaka koje se mogu pojaviti tokom upisa u bazu
-                    $greske[] = ['input' => 'dodatniOsiguranici', 'poruka' => 'Došlo je do greške prilikom upisa dodatnog osiguranika: ' . $e->getMessage()];
+                    $greske[] = 'Došlo je do greške prilikom upisa dodatnog osiguranika: ';
                 }
             }
         }
